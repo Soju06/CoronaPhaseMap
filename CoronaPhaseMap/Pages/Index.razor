@@ -1,0 +1,14 @@
+﻿@page "/"
+@inject IJSRuntime JS
+
+<PageTitle>Index</PageTitle>
+
+<object type="image/svg+xml" id="map" data="/src/map/kr_sigu_19.svg" @onload="OnLoaded" @ref="element">현재 브라우저에서 SVG를 지원하지 않습니다.</object>
+
+@code {
+    ElementReference element;
+    
+    async void OnLoaded(ProgressEventArgs e) {
+        await JS.InvokeAsync<IJSObjectReference>("map.setMap", element);
+    }
+}

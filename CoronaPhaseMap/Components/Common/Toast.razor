@@ -1,0 +1,55 @@
+﻿@using CoronaPhaseMap.Services
+@inject ToastService ToastService
+@implements IDisposable
+
+<div class="m-toast use-penetrate@(show ? "" : " toast-hide")">
+    @for (var i = 0; i < Messages?.Length; i++) {
+        <p>@Messages[i]</p>
+    }
+</div>
+
+@code {
+    const int animationTime = 400;
+    bool looping = true, show;
+    Task? loopTask;
+    string[] Messages = new string[0];
+    Queue<ToastMessage> Query = new();
+
+    protected override void OnInitialized() {
+        ToastService.ShowEvent += OnToast;
+        looping = true;
+        loopTask = OnLoop();
+    }
+
+    async Task OnLoop() {
+        while(looping) {
+            try {
+                var c = Query.Count;
+                if(c >= 1) {
+                    var v = Query.Dequeue();
+                    Messages = v.Messages;
+                    show = true;
+                    StateHasChanged();
+                    await Task.Delay((int)((animationTime + (double)v.ShownTime) / (c == 1 ? 1 : c * 0.4d)));
+                    show = false;
+                    StateHasChanged();
+                }
+            } catch {
+
+            }
+            await Task.Delay(100);
+        }
+    }
+    
+    public void Dispose() {
+        try {
+            looping = false;
+            ToastService.ShowEvent -= OnToast;
+            loopTask?.Dispose();
+        } catch {
+
+        }
+    }
+
+    void OnToast(object sender, ToastMessage messages) => Query.Enqueue(messages);
+}

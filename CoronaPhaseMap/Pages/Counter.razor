@@ -1,0 +1,21 @@
+﻿@page "/counter"
+@using KakaoMap.API.Services
+@inject KakaoMapService Map
+@inject IJSRuntime JS
+
+<PageTitle>Counter</PageTitle>
+
+<div id="map" @ref="element"></div>
+
+@code {
+    ElementReference element;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            var map = await Map.CreateMapAsync(element, new(36.548677, 128.791062));
+            "행정 구역을 가져오고 있습니다.".Toast();
+            await JS.InvokeVoidAsync("administrativeDistrict.init", null, "/src/map/kr_tl_scco_sig_m.json", map.Module);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

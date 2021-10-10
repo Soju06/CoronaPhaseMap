@@ -1,0 +1,25 @@
+﻿.m-toast {
+    background-color: #ffffff;
+    bottom: 10%;
+    position: absolute;
+    z-index: 100000;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0.4rem 0.3rem 1rem 3px #00000042;
+    border-radius: 1.6rem;
+    transition-timing-function: cubic-bezier(.68,0,0,1);
+    transition: all .4s;
+    opacity: 100%;
+    padding: .85rem 2rem;
+    min-width: 10rem;
+    text-align: center;
+}
+
+    .m-toast.toast-hide {
+        bottom: 5% !important;
+        opacity: 0% !important;
+    }
+
+    .m-toast > p {
+        margin: 0
+    }
