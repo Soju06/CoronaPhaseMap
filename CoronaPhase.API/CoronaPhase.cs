@@ -1,8 +1,16 @@
-﻿namespace CoronaPhase.API {
+﻿using System.Text.RegularExpressions;
+
+namespace CoronaPhase.API {
     /// <summary>
     /// 코로나 단계
     /// </summary>
     public class CoronaPhase {
+        /// <summary>
+        /// 데이터 정규식
+        /// </summary>
+        public static readonly Regex Regex = new(
+@".*{\s{0,}caution\s{0,}:\s{0,}'([Y|N]).*value\s{0,}:\s{0,}'(\d).*[DES|des|description].*:[ ]{0,}'(?:-[ ]?)?(.*)\(([\d]{2,4})\.([\d]{1,2})\.([\d]{1,2})\s{0,}~\s{0,}(?:([\d]{2,4}).)?([\d]{1,2}).([\d]{1,2})\.\)'.*}.*\/{2}\s{0,}([ㄱ-ㅎ|가-힣|A-z]{1,})",
+RegexOptions.Compiled);
         /// <summary>
         /// 데이터 시작점
         /// </summary>
@@ -36,7 +44,24 @@
         /// 후처리
         /// </summary>
         void ParseData(string data) {
-            Console.WriteLine(data);
+            var matchs = Regex.Matches(data);
+
+        }
+
+        IEnumerable<CoronaAreaPhase> GetAreaPhases(Match[] matches) {
+            foreach (var matche in matches) {
+                if (!matche.Success) continue;
+                if (matche.Groups.Count != 11) throw new FormatException("정규식이 올바르지 않습니다.");
+                bool caution = matche.Groups[1].Value == "Y";
+                byte phase = byte.Parse(matche.Groups[2].Value);
+                string content = matche.Groups[3].Value.Trim();
+                string cityName;
+                DateTime? startTime = null, endTime = null;
+                yield return new CoronaAreaPhase(caution, phase, 
+                    matche.Groups[3].Value,
+                    matche.Groups[11].Value
+                );
+            }
         }
 
         /// <summary>
